@@ -1,14 +1,20 @@
 #pragma once
 #include <utility>
+#include <iostream>
 #include "generic.hpp"
 
 namespace sim {
-  using Point = std::pair<float, float>
+  /* Point */
+  using Point = std::pair<float, float>;
   using PointVarPtr = VariablePtr<Point>;
+  /* end Point */
 
   ActionPtr translate(AgendaPtr a, const PointVarPtr p, const Curve<Point> c, const std::vector<Instant> keyinstants){
-    notify(a, p, c(0), 0);
-    for(const auto& t : keyinstants) notify(a, p, c(t), t);  
+    auto act = action([a, p, c, keyinstants](){
+      notify(a, p, c(0), 0);
+      for(const auto& t : keyinstants) notify(a, p, c(t), t);
+    });
+    return act;
   }
 
   struct Shape{

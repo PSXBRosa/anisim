@@ -4,7 +4,6 @@
 #include <functional>
 #include <memory>
 #include <map>
-#include <any>
 
 namespace sim{
   // Actions
@@ -12,7 +11,7 @@ namespace sim{
   using ActionPtr = std::shared_ptr<Action>;
   using ActionWeakPtr = std::weak_ptr<Action>;
   inline void execute(ActionPtr t){(*t)();}
-  inline ActionPtr action(Action t) {return make_shared<Action>(t);}
+  inline ActionPtr action(Action t) {return std::make_shared<Action>(t);}
   // end Actions
 
   // Variables
@@ -23,16 +22,15 @@ namespace sim{
   using VariablePtr = std::shared_ptr<Variable<T>>;
 
   template<class T>
-  inline VariablePtr createVariable(T initialValue) {std::make_shared<Variable>(initialValue, {})};
+  inline VariablePtr<T> createVariable(T initialValue) {std::make_shared<Variable>(initialValue, {});};
 
   template<class T>
   inline void link(VariablePtr<T> v, ActionPtr t) {(v->second).push_back(t);}
 
   template<class T>
   void set(VariablePtr<T> var, T val) {
-    if(var->first == val) return;
     auto& [ogVal, actions] = *var;
-    for(auto it = transofrms.begin(); actions.begin() != actions.end(); /* Nothing */){
+    for(auto it = actions.begin(); actions.begin() != actions.end(); /* Nothing */){
       if(auto action = it->lock(); action){
         execute(action);
         it++;
@@ -47,13 +45,17 @@ namespace sim{
   using Instant = int;
   struct Agenda{
     Instant now = 0;
-    std::multimap<Instant, std::pair<VariablePtr<std::any>, std::any>> events;
+    std::multimap<Instant, ActionPtr> events;
   };
   using AgendaPtr = std::shared_ptr<Agenda>;
-  inline AgendaPtr agenda(){return std::make_shared<Agenda>(Agenda);}
+  inline AgendaPtr agenda(){return std::make_shared<Agenda>(Agenda());}
 
-  template<T>
-  inline void notify(AgendaPtr a, VariablePtr w, T val, Instant delay) {(a->events).insert({a->now + delay, {w, val}});}
+  template<class T>
+  inline void notify(AgendaPtr a, VariablePtr<T> w, T val, Instant delay) {
+    (a->events).insert(
+      {a->now + delay, action([w, val](){set(w, val);})}
+    );
+  }
 
   inline bool next(AgendaPtr a) {
     auto& events = a->events;
@@ -64,8 +66,7 @@ namespace sim{
     events.erase(next_it);
     a->now = time;
 
-    auto [var, val] = event;
-    set(var, val);
+    execute(event);
     return true;
   }
 
@@ -77,8 +78,8 @@ namespace sim{
   template<class C>
   using Curve = std::function<C(Instant)>;
 
-  ActionPtr triggerableAction(std::function<bool()>& condition, ActionPtr action){
-    return action([condition, action](){if(condition()) execute(action);});
+  ActionPtr triggerableAction(std::function<bool()>& condition, ActionPtr act){
+    return action([condition, act](){if(condition()) execute(act);});
   }
   // end extensions
 }

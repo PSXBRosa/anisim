@@ -1,6 +1,6 @@
-#pragma once
-#include <generic.hpp>
-#include <shapes.hpp>
+#include "generic.hpp"
+#include "shapes.hpp"
+#include "printer.hpp"
 
 int main(){
   auto s1 = sim::Shape({1, 0});
@@ -8,7 +8,7 @@ int main(){
   auto a  = sim::agenda();
 
   sim::____();
-  sim::display(1, "test", 3);
+  sim::____display(1, "test", s1.center);
   sim::____();
-  return 0
+  return 0;
 }
