@@ -1,14 +1,13 @@
-#include "generic.hpp"
-#include "shapes.hpp"
-#include "printer.hpp"
+#include "include/generic.hpp"
+#include "include/shapes.hpp"
+#include "include/printer.hpp"
+
+using namespace sim;
 
 int main(){
-  auto s1 = sim::Shape({1, 0});
-  auto s2 = sim::Shape({0, 1});
-  auto a  = sim::agenda();
+  auto a  = agenda();
 
-  sim::____();
-  sim::____display(1, "test", s1.center);
-  sim::____();
+  auto p1 = point();
+  auto p2 = dynamicpoint();
   return 0;
 }
