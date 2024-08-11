@@ -1,3 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<point  id="center" x="0" y="0"/>
-<scalar id="radius"/>
+<document>
+<point  name="center" x="0" y="0"/>
+<scalar name="radius"/>
+</document>

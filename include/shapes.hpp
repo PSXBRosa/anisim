@@ -91,14 +91,14 @@ namespace sim {
 
   // Shorthands
   template<class C>
-  using PointVar = ComplexVariable<Point<C>>;
+  using VariablePoint = ComplexVariable<Point<C>>;
 
   template<class C>
-  using DynamicPointVar = ComplexVariable<DynamicPoint<C>>;
+  using VariableDynamicPoint = ComplexVariable<DynamicPoint<C>>;
 
   template<class T = Instant>
-  std::shared_ptr<PointVar<T>> point() {return std::make_shared<PointVar<T>>();};
+  std::shared_ptr<VariablePoint<T>> point() {return std::make_shared<VariablePoint<T>>();};
 
   template<class T = Instant>
-  std::shared_ptr<DynamicPointVar<T>> dynamicpoint() {return std::make_shared<DynamicPointVar<T>>();};
+  std::shared_ptr<VariableDynamicPoint<T>> dynamicpoint() {return std::make_shared<VariableDynamicPoint<T>>();};
 }
