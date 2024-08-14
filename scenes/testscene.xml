@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document>
-<point  name="center" x="0" y="0"/>
-<scalar name="radius"/>
+    <scene>
+        <clock/>
+        <sine name="sine" w="1" amp="1" theta="1"/>
+        <group name="circle">
+            <scalar name="x"      value="0"/>
+            <scalar name="y"      value="0"/>
+            <scalar name="radius" value="1"/>
+        </group>
+    </scene>
+    <events>
+        <follow who="radius" what="sine"/>
+    </events>
 </document>

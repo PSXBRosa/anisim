@@ -68,6 +68,11 @@ namespace PARAMETRIC {
   inline Curve<A, Point<A>> circle(){
     return Curve<A, Point<A>>( [](A t){return Point<A>(std::cos(t * (2 * M_PI)), std::sin(t * (2 * M_PI)));} );
   }
+
+  template<class A = Instant>
+  inline Curve<A, A> sine(A w, A theta){
+    return Curve<A, A>( [w, theta](A t){return std::sin(w * t + theta);} );
+  }
   //
 
 }

@@ -20,6 +20,7 @@ namespace sim{
     public:
       AbstractVariable(VectAct actions) : actions(actions) {}
       AbstractVariable() = default;
+      virtual ~AbstractVariable() = default;
 
       inline void link(ActionPtr t) {actions.push_back(t);}
 
@@ -30,37 +31,28 @@ namespace sim{
           else {it = actions.erase(it);}
         }
       }
-
-      template<class T, class U>
-      void static_set(U newval){
-        static_cast<T>(this)->ival = newval;
-      }
-
-      template<class T, class U>
-      void set(U newval) {
-        if(static_cast<T>(this)->ival == newval) return;
-        static_set<T>(newval);
-        force_update();
-      }
   };
 
   template<class T>
   class Variable : public AbstractVariable {
-    private:
-      using base = AbstractVariable;
-
     protected:
       T ival; // internal value
 
     public:
-      Variable(T val, VectAct actions) : ival(val), base(actions) {}
+      Variable(T val, VectAct actions) : ival(val), AbstractVariable(actions) {}
 
       // Avoid using me, prefer set.
-      void set(T newval) {
-        base::set<Variable<T>, T>(newval);
+      void static_set(T newval){
+        ival = newval;
       }
 
-      inline T& val() const {return ival;}
+      void set(T newval) {
+        if(ival == newval) return;
+        static_set(newval);
+        force_update();
+      }
+
+      T val() {return ival;}
   };
 
   // This class template provides access to the methods from C
@@ -84,6 +76,7 @@ namespace sim{
     public:
       void push(std::weak_ptr<AbstractVariable> varptr) {buff.push_back(varptr);}
       std::weak_ptr<AbstractVariable> pop() {auto out = buff.back(); buff.pop_back(); return out;}
+      std::weak_ptr<AbstractVariable> at(size_t pos) {return buff[pos];}
   };
 
   /*
@@ -91,11 +84,20 @@ namespace sim{
    */
   using VariableGroup = ComplexVariable<VariableQueue>;
 
+  class SmartVariableGroup {
+    private:
+      VariableGroup constrained;
+      VariableGroup free;
+    public:
+      SmartVariableGroup(VariableGroup c, VariableGroup f) : constrained(c), free(f) {}
+  };
+
   template<class T>
   using VariablePtr = std::shared_ptr<Variable<T>>;
 
   template<class T>
   inline VariablePtr<T> var(T initialValue) {return std::make_shared<Variable<T>>(initialValue, VectAct());};
   // end Variables
-  // end extensions
+
+  std::map<std::string, sim::AbstractVariable>(varHandler);
 }
